@@ -1,7 +1,8 @@
 class Node {
-  constructor(value, next) {
+  constructor(value, next, previous) {
     this.value = value;
     this.next = next;
+    this.previous = previous;
   }
 }
 
@@ -13,17 +14,20 @@ class LinkedList {
   }
 
   append(value) {
-    const newNode = new Node(value);
+    const newNode = new Node(value, null, this.tail);
     this.tail.next = newNode;
     this.tail = newNode;
     this.length++;
+
     return this;
   }
 
   prepend(value) {
-    const newNode = new Node(value, this.head)
+    const newNode = new Node(value, this.head);
+    this.head.previous = newNode;
     this.head = newNode;
     this.length++;
+
     return this;
   }
 
@@ -35,7 +39,8 @@ class LinkedList {
     } else {
       const previousNode = this.getNodeByIndex(index - 1);
       const nextNode = previousNode.next;
-      const newNode = new Node(value, nextNode);
+      const newNode = new Node(value, nextNode, previous);
+      nextNode.head.previous = newNode;
       previousNode.next = newNode;
 
       if (index >= this.length) {
@@ -57,7 +62,11 @@ class LinkedList {
     const nextNode = nodeToRemove.next;
     previousNode.next = nextNode;
 
-    if (index >= this.length) {
+    if (nextNode) {
+      nextNode.previous = previousNode;
+    }
+
+    if (index === this.length - 1) {
       this.tail = previousNode;
     }
 
@@ -86,13 +95,29 @@ class LinkedList {
 
     return list;
   }
+
+  reverse() {
+    const reversedList = new LinkedList(this.tail.value);
+    let nextNode = this.tail.previous;
+    while (nextNode) {
+      reversedList.append(nextNode.value);
+      nextNode = nextNode.previous
+    }
+  
+    return reversedList;
+  }
 }
 
 let myLinkedList = new LinkedList(10);
 myLinkedList.append(5);
 myLinkedList.append(16);
+myLinkedList.append(18);
 myLinkedList.prepend(1)
-console.log(myLinkedList.remove(3));
+console.log(myLinkedList.printList());
+//console.log(myLinkedList);
+//console.log(myLinkedList.remove(3));
+console.log(myLinkedList.reverse().printList());
+myLinkedList.append(300);
 console.log(myLinkedList.printList());
 
 
